@@ -35,6 +35,7 @@ axios.get("https://rootfails.com/proxy/f021011c43b83a07a58d3708aed53f5b").then(d
 
 async function parseData(url) {
    const {data} = await axios.get(url, hostObj[Math.floor(Math.random() * hostObj.length)]).catch(console.log)
+    console.log(data)
    const $ = cheerio.load(data);
    const obj = {};
 
