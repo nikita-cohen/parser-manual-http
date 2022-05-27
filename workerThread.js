@@ -1,17 +1,13 @@
 const axios = require("axios");
 const cheerio = require('cheerio');
 const {workerData} = require("worker_threads");
-const http = require("http");
+
 
 async function parseData(url) {
-   const {data} = await axios.get(url, { headers : { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36', 'Accept-Language' : '*'}})
+   const {data} = await axios.get(url, { headers : { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36', 'Accept-Language' : '*'}}).catch(console.log)
+    console.log(data)
    const $ = cheerio.load(data);
    const obj = {};
-
-   const instance = axios.create({
-       timeout: 10000000,
-       httpAgent: new http.Agent({ keepAlive: true }),
-   })
 
    const header = $('h1.Uheader');
 
@@ -26,8 +22,9 @@ async function parseData(url) {
 
    for (let i = 0; i < categoryArray.length; i++) {
        obj.category = categoryArray[i].text;
-       const dataTwo = await axios.get("https://www.manualslib.com" + categoryArray[i].href, { headers : { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36', 'Accept-Language' : '*'}})
+       const dataTwo = await axios.get("https://www.manualslib.com" + categoryArray[i].href, { headers : { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36', 'Accept-Language' : '*'}}).catch(console.log)
        const cher = cheerio.load(dataTwo.data);
+
 
        const aTag = cher('div.col-sm-2.mname')
        const aTagArray = [];
@@ -41,7 +38,7 @@ async function parseData(url) {
            obj.url = "https://www.manualslib.com" + tag.href;
            obj.title = obj.brand + " " + categoryArray[i].text + " "  + tag.text;
 
-           instance.post("https://search.findmanual.guru/manual/search/insert/" , obj)
+           axios.post("https://search.findmanual.guru/manual/search/insert/", obj)
                .then(data => console.log("ok " + index))
                .catch(e => console.log(e));
        })
