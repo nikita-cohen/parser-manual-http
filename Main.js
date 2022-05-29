@@ -93,7 +93,7 @@ async function runWorker() {
 //     }, msToMidnight);
 // }
 
-runWorker().then();
+runWorker().then().catch(e => console.log(e));
 // resetAtMidnight();
 
 
