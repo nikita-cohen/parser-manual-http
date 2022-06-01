@@ -52,15 +52,16 @@ const data = [
     {url: "https://www.manualslib.com/brand/toshiba/", maxNum: 424, num: 50},
     {url: "https://www.manualslib.com/brand/whirlpool/", maxNum: 158, num: 51}
 ]
+let result = [];
 
 async function runWorker(url) {
     return new Promise((resolve, reject) => {
         const worker = new Worker('./workerThread', {
             workerData: url
         })
-
         worker.on("message", (message) => {
             if (message.message === "done") {
+                result = [...result, ...message.result]
                 if (data.length > 0) {
                     worker.postMessage({message : "run", data : data.shift()})
                 } else {
@@ -76,10 +77,12 @@ async function runWorker(url) {
 
 }
 
+
 function loadArray() {
     return new Promise((resolve, reject) => {
         Promise.all(data.map((d, i) => {
             if (i < 24) {
+                console.log("index " + i)
                 return runWorker(data.shift())
             }
         })).then(resolve).catch(reject);
@@ -102,18 +105,18 @@ function resetAtMidnight() {
     );
 
     let msToMidnight = night.getTime() - now.getTime();
-    setTimeout(function() {
-        initLoadingArray().then();            //  <-- This is the function being called at midnight.
+    setTimeout(async function() {
+        await initLoadingArray();            //  <-- This is the function being called at midnight.
         resetAtMidnight();    //      Then, reset again next midnight.
     }, msToMidnight);
 }
 
 function init() {
-    initLoadingArray().then();
+    initLoadingArray().then()
     resetAtMidnight();
 }
 
-init();
+init()
 
 
 

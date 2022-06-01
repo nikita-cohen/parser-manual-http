@@ -56,29 +56,30 @@ let userAgent = [{'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple
 ]
 
 let hostObj = [];
-//
-// axios.get("https://rootfails.com/proxy/f021011c43b83a07a58d3708aed53f5b").then(data => {
-//     let host = data.data.split("\n");
-//
-//     host.forEach(proxy => {
-//
-//         const obj = {};
-//         obj.host = proxy.split(":")[0];
-//         obj.port = proxy.split(":")[1];
-//         obj.headers = userAgent[Math.floor(Math.random() * 6)]
-//         obj.proxy = {};
-//         obj.proxy.host = proxy.split(":")[0];
-//         obj.proxy.port = proxy.split(":")[1];
-//         obj.proxy.headers = userAgent[Math.floor(Math.random() * 6)]
-//
-//         hostObj.push(obj);
-//     })
-//
-// })
+
+axios.get("https://rootfails.com/proxy/f021011c43b83a07a58d3708aed53f5b").then(data => {
+    let host = data.data.split("\n");
+
+    host.forEach(proxy => {
+
+        const obj = {};
+        obj.host = proxy.split(":")[0];
+        obj.port = proxy.split(":")[1];
+        obj.headers = userAgent[Math.floor(Math.random() * 6)]
+        obj.proxy = {};
+        obj.proxy.host = proxy.split(":")[0];
+        obj.proxy.port = proxy.split(":")[1];
+        obj.proxy.headers = userAgent[Math.floor(Math.random() * 6)]
+
+        hostObj.push(obj);
+    })
+
+})
 
 async function parseData(url) {
-   const {data} = await axios.get(url).catch(console.log)
+   const {data} = await axios.get(url , hostObj[Math.floor(Math.random() * hostObj.length)]).catch(console.log)
    const $ = cheerio.load(data);
+   const result = [];
    const obj = {};
 
    const header = $('h1.Uheader');
@@ -97,38 +98,33 @@ async function parseData(url) {
        try {
            obj.category = categoryArray[i].text;
 
-           const dataTwo = await axios.get("https://www.manualslib.com" + categoryArray[i].href).catch(console.log)
+           const dataTwo = await axios.get("https://www.manualslib.com" + categoryArray[i].href , hostObj[Math.floor(Math.random() * hostObj.length)]).catch()
            const cher = cheerio.load(dataTwo.data);
 
            const aTag = cher('div.col-sm-2.mname')
-           const aTagArray = [];
-
 
            for (let j = 0 ; j < aTag.length; j++) {
-               aTagArray.push({"href":  $(aTag[j]).children("a").attr('href'), "text": $(aTag[j]).children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim()})
+               obj.url = "https://www.manualslib.com" + $(aTag[j]).children("a").attr('href');
+               obj.title = obj.brand + " " + categoryArray[i].text + " "  + $(aTag[j]).children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim();
+               //result.push(obj)
+               axios.post("https://search.findmanual.guru/manual/search/insert", obj)
+                   .then(data => console.log("ok " + j))
+                   .catch(e => console.log(e));
            }
 
-
-           aTagArray.forEach((tag, index) => {
-               obj.url = "https://www.manualslib.com" + tag.href;
-               obj.title = obj.brand + " " + categoryArray[i].text + " "  + tag.text;
-
-               axios.post("https://search.findmanual.guru/manual/search/insert/", obj)
-                   .then(data => console.log("ok " + index))
-                   .catch(e => console.log(e));
-           })
        } catch (e) {
 
        }
-
    }
-   parentPort.postMessage({message : "done"});
+   console.log(result.length)
+   parentPort.postMessage({message : "done", result});
 }
 
 parseData(workerData.url).then();
 
 parentPort.on('message' , async (m) => {
     if (m.message === "run") {
+        console.log(m)
         await parseData(m.data.url)
     }
 })
