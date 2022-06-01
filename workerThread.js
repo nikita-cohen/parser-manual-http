@@ -79,9 +79,9 @@ axios.get("https://rootfails.com/proxy/f021011c43b83a07a58d3708aed53f5b").then(d
 })
 
 async function parseData(url) {
-    console.log("here 2")
    const {data} = await axios.get(url, hostObj[Math.floor(Math.random() * hostObj.length)]).catch(console.log)
 
+    console.log(data)
    const $ = cheerio.load(data);
    const obj = {};
 
@@ -89,7 +89,6 @@ async function parseData(url) {
 
    obj.brand = $(header[0]).text();
 
-   console.log($(header[0]).text())
 
    const category = $('div.cathead');
    const categoryArray = [];
