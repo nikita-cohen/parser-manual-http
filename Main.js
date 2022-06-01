@@ -103,7 +103,7 @@ function resetAtMidnight() {
 
     let msToMidnight = night.getTime() - now.getTime();
     setTimeout(function() {
-        initLoadingArray().then();            //      <-- This is the function being called at midnight.
+        initLoadingArray().then();            //  <-- This is the function being called at midnight.
         resetAtMidnight();    //      Then, reset again next midnight.
     }, msToMidnight);
 }
