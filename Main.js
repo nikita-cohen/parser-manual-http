@@ -60,7 +60,6 @@ const data = [
 ]
 
 async function runWorker() {
-    console.log("ok")
     const result = await Promise.all(data.map((obj, index) => {
         new Promise((resolve, reject) =>  {
             const worker = new Worker('./workerThread', {
@@ -74,7 +73,6 @@ async function runWorker() {
             })
         })
     }))
-
 }
 
 // function resetAtMidnight() {
