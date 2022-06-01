@@ -103,6 +103,7 @@ async function parseData(url) {
        const dataTwo = await axios.get("https://www.manualslib.com" + categoryArray[i].href, hostObj[Math.floor(Math.random() * hostObj.length)]).catch(console.log)
        const cher = cheerio.load(dataTwo.data);
 
+       console.log("here 4")
 
        const aTag = cher('div.col-sm-2.mname')
        const aTagArray = [];
@@ -111,6 +112,8 @@ async function parseData(url) {
        for (let j = 0 ; j < aTag.length; j++) {
            aTagArray.push({"href":  $(aTag[j]).children("a").attr('href'), "text": $(aTag[j]).children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim()})
        }
+
+       console.log("here 5")
 
        aTagArray.forEach((tag, index) => {
            obj.url = "https://www.manualslib.com" + tag.href;
