@@ -99,6 +99,7 @@ async function parseData(url) {
    }
    console.log("here 3")
    for (let i = 0; i < categoryArray.length; i++) {
+       console.log("here 3.2")
        obj.category = categoryArray[i].text;
        console.log("here 3.5")
        const dataTwo = await axios.get("https://www.manualslib.com" + categoryArray[i].href, hostObj[Math.floor(Math.random() * hostObj.length)]).catch(console.log)
