@@ -78,6 +78,7 @@ axios.get("https://rootfails.com/proxy/f021011c43b83a07a58d3708aed53f5b").then(d
 
 })
 
+console.log(workerData)
 
 
 async function parseData(url) {
