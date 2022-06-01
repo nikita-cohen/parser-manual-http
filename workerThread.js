@@ -97,7 +97,7 @@ async function parseData(url) {
    for (let i = 0; i < category.length; i++) {
        categoryArray.push({"href":  $(category[i]).children("a").attr('href'), "text": $(category[i]).children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim()})
    }
-   console.log("here 3")
+   console.log(categoryArray)
    for (let i = 0; i < categoryArray.length; i++) {
        console.log("here 3.2")
        obj.category = categoryArray[i].text;
