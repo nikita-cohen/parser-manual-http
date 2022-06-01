@@ -2,6 +2,8 @@ const axios = require("axios");
 const cheerio = require('cheerio');
 const {workerData, parentPort} = require("worker_threads");
 
+console.log("here")
+
 let userAgent = [{'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Accept-Language' : '*'}
     , {'User-Agent' : "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36", 'Accept-Language' : '*'},
     {'User-Agent' : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9", 'Accept-Language' : '*'},
@@ -79,6 +81,7 @@ axios.get("https://rootfails.com/proxy/f021011c43b83a07a58d3708aed53f5b").then(d
 
 
 async function parseData(url) {
+    console.log("here 2")
    const {data} = await axios.get(url, hostObj[Math.floor(Math.random() * hostObj.length)]).catch(console.log)
 
    const $ = cheerio.load(data);
