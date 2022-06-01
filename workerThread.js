@@ -1,6 +1,6 @@
 const axios = require("axios");
 const cheerio = require('cheerio');
-const {workerData} = require("worker_threads");
+const {workerData, parentPort} = require("worker_threads");
 
 let userAgent = [{'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Accept-Language' : '*'}
     , {'User-Agent' : "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36", 'Accept-Language' : '*'},
@@ -113,11 +113,9 @@ async function parseData(url) {
            obj.url = "https://www.manualslib.com" + tag.href;
            obj.title = obj.brand + " " + categoryArray[i].text + " "  + tag.text;
 
-           console.log(obj)
-
-           // axios.post("https://search.findmanual.guru/manual/search/insert/", obj)
-           //     .then(data => console.log("ok " + index))
-           //     .catch(e => console.log(e));
+           axios.post("https://search.findmanual.guru/manual/search/insert/", obj)
+               .then(data => console.log("ok " + index))
+               .catch(e => console.log(e));
        })
 
    }
@@ -125,3 +123,10 @@ async function parseData(url) {
 }
 
 parseData(workerData.url).then();
+
+parentPort.on('message' , async (m) => {
+    if (m.message === "run") {
+        await parseData(m.data.url)
+        parentPort.postMessage("done");
+    }
+})
