@@ -119,7 +119,7 @@ async function parseData(url) {
        })
 
    }
-    parentPort.postMessage("done");
+   parentPort.postMessage("done");
 
 }
 

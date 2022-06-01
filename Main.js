@@ -81,7 +81,7 @@ async function runWorker(url) {
 function loadArray() {
     return new Promise((resolve, reject) => {
         Promise.all(data.map((d, i) => {
-            if (i < 25) {
+            if (i < 20) {
                 return runWorker(data.shift())
             }
         })).then(resolve).catch(reject);
