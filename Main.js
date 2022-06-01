@@ -61,6 +61,7 @@ const data = [
 
 async function runWorker(url) {
     return new Promise((resolve, reject) => {
+        console.log(5)
         const worker = new Worker('./workerThread', {
             workerData: url
         })
@@ -82,6 +83,7 @@ function loadArray() {
     return new Promise((resolve, reject) => {
         Promise.all(data.map((d, i) => {
             if (i < 20) {
+                console.log("index", i)
                 return runWorker(data.shift())
             }
         })).then(resolve).catch(reject);
@@ -90,15 +92,17 @@ function loadArray() {
 
 async function initLoadingArray() {
     console.time('parsing_array');
+    console.log(2)
     await loadArray();
     console.timeEnd('parsing_array');
 }
 
 function init() {
+    console.log(1)
     initLoadingArray().then();
 }
 
-init()
+init();
 
 // function resetAtMidnight() {
 //     let now = new Date();
