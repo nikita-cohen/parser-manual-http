@@ -2,8 +2,6 @@ const axios = require("axios");
 const cheerio = require('cheerio');
 const {workerData, parentPort} = require("worker_threads");
 
-console.log("here")
-
 let userAgent = [{'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Accept-Language' : '*'}
     , {'User-Agent' : "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36", 'Accept-Language' : '*'},
     {'User-Agent' : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9", 'Accept-Language' : '*'},
@@ -80,8 +78,6 @@ axios.get("https://rootfails.com/proxy/f021011c43b83a07a58d3708aed53f5b").then(d
 
 async function parseData(url) {
    const {data} = await axios.get(url, hostObj[Math.floor(Math.random() * hostObj.length)]).catch(console.log)
-
-    console.log(data)
    const $ = cheerio.load(data);
    const obj = {};
 
@@ -96,15 +92,13 @@ async function parseData(url) {
    for (let i = 0; i < category.length; i++) {
        categoryArray.push({"href":  $(category[i]).children("a").attr('href'), "text": $(category[i]).children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim()})
    }
-   console.log(categoryArray)
+
    for (let i = 0; i < categoryArray.length; i++) {
-       console.log("here 3.2")
+
        obj.category = categoryArray[i].text;
-       console.log("here 3.5")
+
        const dataTwo = await axios.get("https://www.manualslib.com" + categoryArray[i].href, hostObj[Math.floor(Math.random() * hostObj.length)]).catch(console.log)
        const cher = cheerio.load(dataTwo.data);
-
-       console.log("here 4")
 
        const aTag = cher('div.col-sm-2.mname')
        const aTagArray = [];
@@ -113,8 +107,6 @@ async function parseData(url) {
        for (let j = 0 ; j < aTag.length; j++) {
            aTagArray.push({"href":  $(aTag[j]).children("a").attr('href'), "text": $(aTag[j]).children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim()})
        }
-
-       console.log("here 5")
 
        aTagArray.forEach((tag, index) => {
            obj.url = "https://www.manualslib.com" + tag.href;
@@ -126,7 +118,7 @@ async function parseData(url) {
        })
 
    }
-   //parentPort.postMessage("done");
+   parentPort.postMessage("done");
 
 }
 
@@ -135,6 +127,5 @@ parseData(workerData.url).then();
 parentPort.on('message' , async (m) => {
     if (m.message === "run") {
         await parseData(m.data.url)
-        parentPort.postMessage("done");
     }
 })

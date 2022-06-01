@@ -1,11 +1,5 @@
 const {Worker, workerData} = require("worker_threads");
 
-// let instance = axios.create({
-//     baseURL: "https://search.findmanual.guru/",
-//     timeout: 60000, //optional
-//     httpsAgent: new https.Agent({keepAlive: true}),
-// })
-
 const data = [
     {url: "https://www.manualslib.com/brand/acer/", maxNum: 158, num: 2},
     {url: "https://www.manualslib.com/brand/aeg/", maxNum: 406, num: 3},
@@ -61,7 +55,6 @@ const data = [
 
 async function runWorker(url) {
     return new Promise((resolve, reject) => {
-        console.log(5)
         const worker = new Worker('./workerThread', {
             workerData: url
         })
@@ -92,13 +85,11 @@ function loadArray() {
 
 async function initLoadingArray() {
     console.time('parsing_array');
-    console.log(2)
     await loadArray();
     console.timeEnd('parsing_array');
 }
 
 function init() {
-    console.log(1)
     initLoadingArray().then();
 }
 
