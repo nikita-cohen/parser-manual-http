@@ -61,7 +61,11 @@ async function runWorker(url) {
 
         worker.on("message", (message) => {
             if (message.message === "done") {
-                worker.postMessage({message : "run", data : data.shift()})
+                if (data.length > 0) {
+                    worker.postMessage({message : "run", data : data.shift()})
+                } else {
+                    resolve(message)
+                }
             }
         });
         worker.on("error", reject);
@@ -75,8 +79,7 @@ async function runWorker(url) {
 function loadArray() {
     return new Promise((resolve, reject) => {
         Promise.all(data.map((d, i) => {
-            if (i < 20) {
-                console.log("index", i)
+            if (i < 24) {
                 return runWorker(data.shift())
             }
         })).then(resolve).catch(reject);
@@ -89,28 +92,28 @@ async function initLoadingArray() {
     console.timeEnd('parsing_array');
 }
 
+function resetAtMidnight() {
+    let now = new Date();
+    let night = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1, // the next day, ...
+        0, 0, 0 // ...at 00:00:00 hours
+    );
+
+    let msToMidnight = night.getTime() - now.getTime();
+    setTimeout(function() {
+        initLoadingArray().then();            //      <-- This is the function being called at midnight.
+        resetAtMidnight();    //      Then, reset again next midnight.
+    }, msToMidnight);
+}
+
 function init() {
     initLoadingArray().then();
+    resetAtMidnight();
 }
 
 init();
-
-// function resetAtMidnight() {
-//     let now = new Date();
-//     let night = new Date(
-//         now.getFullYear(),
-//         now.getMonth(),
-//         now.getDate() + 1, // the next day, ...
-//         0, 0, 0 // ...at 00:00:00 hours
-//     );
-//
-//     let msToMidnight = night.getTime() - now.getTime();
-//     setTimeout(function() {
-//                     //      <-- This is the function being called at midnight.
-//         resetAtMidnight();    //      Then, reset again next midnight.
-//     }, msToMidnight);
-// }
-// resetAtMidnight();
 
 
 
