@@ -52,7 +52,6 @@ const data = [
     {url: "https://www.manualslib.com/brand/toshiba/", maxNum: 424, num: 50},
     {url: "https://www.manualslib.com/brand/whirlpool/", maxNum: 158, num: 51}
 ]
-let result = [];
 
 async function runWorker(url) {
     return new Promise((resolve, reject) => {
@@ -61,7 +60,6 @@ async function runWorker(url) {
         })
         worker.on("message", (message) => {
             if (message.message === "done") {
-                result = [...result, ...message.result]
                 if (data.length > 0) {
                     worker.postMessage({message : "run", data : data.shift()})
                 } else {
@@ -77,11 +75,10 @@ async function runWorker(url) {
 
 }
 
-
 function loadArray() {
     return new Promise((resolve, reject) => {
         Promise.all(data.map((d, i) => {
-            if (i < 24) {
+            if (i < 50) {
                 console.log("index " + i)
                 return runWorker(data.shift())
             }
@@ -112,7 +109,6 @@ function resetAtMidnight() {
 }
 
 function init() {
-    initLoadingArray().then()
     resetAtMidnight();
 }
 

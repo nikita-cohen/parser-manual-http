@@ -76,11 +76,12 @@ axios.get("https://rootfails.com/proxy/f021011c43b83a07a58d3708aed53f5b").then(d
 
 })
 
+// , hostObj[Math.floor(Math.random() * hostObj.length)]
+
 async function parseData(url) {
-   const {data} = await axios.get(url , hostObj[Math.floor(Math.random() * hostObj.length)]).catch(console.log)
-    console.log(data)
+
+   const {data} = await axios.get(url ).catch(console.log)
    const $ = cheerio.load(data);
-   const result = [];
    const obj = {};
 
    const header = $('h1.Uheader');
@@ -99,7 +100,7 @@ async function parseData(url) {
        try {
            obj.category = categoryArray[i].text;
 
-           const dataTwo = await axios.get("https://www.manualslib.com" + categoryArray[i].href , hostObj[Math.floor(Math.random() * hostObj.length)]).catch()
+           const dataTwo = await axios.get("https://www.manualslib.com" + categoryArray[i].href).catch()
            const cher = cheerio.load(dataTwo.data);
 
            const aTag = cher('div.col-sm-2.mname')
@@ -108,24 +109,27 @@ async function parseData(url) {
                obj.url = "https://www.manualslib.com" + $(aTag[j]).children("a").attr('href');
                obj.title = obj.brand + " " + categoryArray[i].text + " "  + $(aTag[j]).children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim();
                //result.push(obj)
-               axios.post("https://search.findmanual.guru/manual/search/insert", obj)
+               obj.id = obj.brand.replaceAll(' ', '_') + "_" + categoryArray[i].text.replaceAll(' ', '_') + "_"  + $(aTag[j]).children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim().replaceAll(' ', '_')
+
+               await axios.post("https://search.findmanual.guru/manual/search/insert", obj)
                    .then(data => console.log("ok " + j))
-                   .catch(e => console.log(e));
+                   .catch(e => {
+                       console.log(e)
+                   });
            }
 
        } catch (e) {
 
        }
    }
-   console.log(result.length)
-   parentPort.postMessage({message : "done", result});
+
+   parentPort.postMessage({message : "done"});
 }
 
 parseData(workerData.url).then();
 
 parentPort.on('message' , async (m) => {
     if (m.message === "run") {
-        console.log(m)
         await parseData(m.data.url)
     }
 })
