@@ -111,11 +111,14 @@ async function parseData(url) {
                //result.push(obj)
                obj.id = obj.brand.replaceAll(' ', '_') + "_" + categoryArray[i].text.replaceAll(' ', '_') + "_"  + $(aTag[j]).children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim().replaceAll(' ', '_')
 
-               await axios.post("https://search.findmanual.guru/manual/search/insert", obj)
-                   .then(data => console.log("ok " + j))
-                   .catch(e => {
-                       console.log(e)
-                   });
+               if (obj.url !== "https://www.manualslib.comundefined"){
+                   await axios.post("https://search.findmanual.guru/manual/search/insert", obj)
+                       .then(data => console.log("ok " + j))
+                       .catch(e => {
+                           console.log(e)
+                       });
+               }
+
            }
 
        } catch (e) {
