@@ -2,6 +2,7 @@ const axios = require("axios");
 const cheerio = require('cheerio');
 const {workerData, parentPort} = require("worker_threads");
 const https = require("https");
+const http = require("http");
 
 let userAgent = [{'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Accept-Language' : '*'}
     , {'User-Agent' : "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36", 'Accept-Language' : '*'},
@@ -71,7 +72,6 @@ let host = {
 }
 
 let hostObj = [];
-hostObj.push(host)
 //
 // axios.get("https://rootfails.com/proxy/f021011c43b83a07a58d3708aed53f5b").then(data => {
 //     let host = data.data.split("\n");
@@ -98,17 +98,42 @@ async function parseData(url) {
     let data;
 
     try {
-        data = await axios.get(url, hostObj[0])
+        data = await axios.get(url, {
+                host : "95.182.120.214",
+                port : 44738,
+                headers : {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Accept-Language' : '*'},
+                auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
+                // proxy : {
+                //     protocol : "http",
+                //     host : '95.182.120.214',
+                //     port : 44738,
+                //     headers : userAgent[Math.floor(Math.random() * 6)],
+                //     auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
+                // }
+
+            }
+        )
     } catch (e) {
         console.log("mistake --------------------------------------------------------")
         try {
-            data = await axios.get(url, hostObj[0])
+            data = await axios.get(url, {
+                host : "95.182.120.214",
+                port : 44738,
+                headers : {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Accept-Language' : '*'},
+                auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
+                // proxy : {
+                //     protocol : "http",
+                //     host : '95.182.120.214',
+                //     port : 44738,
+                //     headers : userAgent[Math.floor(Math.random() * 6)],
+                //     auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
+                // }
+
+            })
         } catch (e) {
             console.log("can't take this url")
         }
     }
-
-    console.log(data.data)
 
     const hrefArray = [];
 
@@ -138,11 +163,37 @@ async function parseDataTwo(url) {
     let data;
 
     try {
-        data = await axios.get(url, hostObj[0])
+        data = await axios.get(url, {
+            host : "95.182.120.214",
+            port : 44738,
+            headers : {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Accept-Language' : '*'},
+            auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
+            // proxy : {
+            //     protocol : "http",
+            //     host : '95.182.120.214',
+            //     port : 44738,
+            //     headers : userAgent[Math.floor(Math.random() * 6)],
+            //     auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
+            // }
+
+        })
     } catch (e) {
         console.log("mistake --------------------------------------------------------")
         try {
-            data = await axios.get(url, hostObj[0]).catch(console.log)
+            data = await axios.get(url, {
+                host : "95.182.120.214",
+                port : 44738,
+                headers : {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Accept-Language' : '*'},
+                auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
+                // proxy : {
+                //     protocol : "http",
+                //     host : '95.182.120.214',
+                //     port : 44738,
+                //     headers : userAgent[Math.floor(Math.random() * 6)],
+                //     auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
+                // }
+
+            }).catch(console.log)
         } catch (e) {
             console.log("can't take this url")
         }
@@ -175,11 +226,37 @@ async function parseDataThree(url) {
     const result = [];
 
     try {
-        data = await axios.get(url, hostObj[0])
+        data = await axios.get(url, {
+            host : "95.182.120.214",
+            port : 44738,
+            headers : {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Accept-Language' : '*'},
+            auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
+            // proxy : {
+            //     protocol : "http",
+            //     host : '95.182.120.214',
+            //     port : 44738,
+            //     headers : userAgent[Math.floor(Math.random() * 6)],
+            //     auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
+            // }
+
+        })
     } catch (e) {
         console.log("mistake --------------------------------------------------------")
         try {
-            data = await axios.get(url, hostObj[0])
+            data = await axios.get(url, {
+                host : "95.182.120.214",
+                port : 44738,
+                headers : {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Accept-Language' : '*'},
+                auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
+                // proxy : {
+                //     protocol : "http",
+                //     host : '95.182.120.214',
+                //     port : 44738,
+                //     headers : userAgent[Math.floor(Math.random() * 6)],
+                //     auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
+                // }
+
+            })
         } catch (e) {
             console.log("can't take this url")
         }
@@ -233,7 +310,20 @@ async function parseDataThree(url) {
                 let isContinue = true;
 
                 try {
-                    newPage = await axios.get(url + "?page=" + count, hostObj[0]);
+                    newPage = await axios.get(url + "?page=" + count, {
+                        host : "95.182.120.214",
+                        port : 44738,
+                        headers : {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Accept-Language' : '*'},
+                        auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
+                        // proxy : {
+                        //     protocol : "http",
+                        //     host : '95.182.120.214',
+                        //     port : 44738,
+                        //     headers : userAgent[Math.floor(Math.random() * 6)],
+                        //     auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
+                        // }
+
+                    });
                 } catch (e) {
                     isContinue = false;
                     isPages = false;
