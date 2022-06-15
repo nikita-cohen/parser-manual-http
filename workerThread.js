@@ -62,7 +62,7 @@ let host = {
     headers : {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Accept-Language' : '*'},
     auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'},
     proxy : {
-        host : "95.182.120.214",
+        host : '95.182.120.214',
         port : 44738,
         headers : userAgent[Math.floor(Math.random() * 6)],
         auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
@@ -70,7 +70,8 @@ let host = {
 
 }
 
-// let hostObj = [];
+let hostObj = [];
+hostObj.push(host)
 //
 // axios.get("https://rootfails.com/proxy/f021011c43b83a07a58d3708aed53f5b").then(data => {
 //     let host = data.data.split("\n");
@@ -97,17 +98,16 @@ async function parseData(url) {
     let data;
 
     try {
-        data = await axios.get(url)
+        data = await axios.get(url, hostObj[0])
     } catch (e) {
         console.log("mistake --------------------------------------------------------")
         try {
-            data = await axios.get(url)
+            data = await axios.get(url, hostObj[0])
         } catch (e) {
             console.log("can't take this url")
         }
     }
 
-    console.log(data.data)
     const hrefArray = [];
 
     try {
@@ -136,11 +136,11 @@ async function parseDataTwo(url) {
     let data;
 
     try {
-        data = await axios.get(url)
+        data = await axios.get(url, hostObj[0])
     } catch (e) {
         console.log("mistake --------------------------------------------------------")
         try {
-            data = await axios.get(url).catch(console.log)
+            data = await axios.get(url, hostObj[0]).catch(console.log)
         } catch (e) {
             console.log("can't take this url")
         }
@@ -173,11 +173,11 @@ async function parseDataThree(url) {
     const result = [];
 
     try {
-        data = await axios.get(url)
+        data = await axios.get(url, hostObj[0])
     } catch (e) {
         console.log("mistake --------------------------------------------------------")
         try {
-            data = await axios.get(url)
+            data = await axios.get(url, hostObj[0])
         } catch (e) {
             console.log("can't take this url")
         }
@@ -231,7 +231,7 @@ async function parseDataThree(url) {
                 let isContinue = true;
 
                 try {
-                    newPage = await axios.get(url + "?page=" + count, host);
+                    newPage = await axios.get(url + "?page=" + count, hostObj[0]);
                 } catch (e) {
                     isContinue = false;
                     isPages = false;
