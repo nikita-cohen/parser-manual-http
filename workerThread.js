@@ -57,21 +57,21 @@ let userAgent = [{'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple
     {'User-Agent' : "Mozilla/5.0 (Windows; U; Windows NT 9.1; en-US; rv:12.9.1.11) Gecko/20100821 Firefox/70", 'Accept-Language' : '*'}
 ]
 
-let host = {
-    host : "95.182.120.214",
-    port : 44738,
-    headers : {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Accept-Language' : '*'},
-    auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'},
-    proxy : {
-        host : '95.182.120.214',
-        port : 44738,
-        headers : userAgent[Math.floor(Math.random() * 6)],
-        auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
-    }
-
-}
-
-let hostObj = [];
+// let host = {
+//     host : "95.182.120.214",
+//     port : 44738,
+//     headers : {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Accept-Language' : '*'},
+//     auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'},
+//     proxy : {
+//         host : '95.182.120.214',
+//         port : 44738,
+//         headers : userAgent[Math.floor(Math.random() * 6)],
+//         auth: {username: 'hp8DxmmGZx8Qyr', password: 'jonny17713'}
+//     }
+//
+// }
+//
+// let hostObj = [];
 //
 // axios.get("https://rootfails.com/proxy/f021011c43b83a07a58d3708aed53f5b").then(data => {
 //     let host = data.data.split("\n");

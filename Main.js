@@ -134,7 +134,7 @@ const AMOUNT = 40;
 const instance = axios.create(
     {
         baseURL : "https://search.findmanual.guru/manual/search/insert",
-        timeout : 60000,
+        timeout : 60000000000000000000000000000000000000000000000000,
         httpsAgent : new https.Agent({keepAlive : true})
     }
 )
@@ -193,8 +193,8 @@ function initLoadingArray() {
 
 function insertToDb() {
     if(isRunning) {
-        if (dataForDb.length >= 200) {
-            const insertDataToDb = dataForDb.splice(0, 100);
+        if (dataForDb.length >= 50) {
+            const insertDataToDb = dataForDb.splice(0, 50);
             instance.post("https://search.findmanual.guru/manual/search/insert", {"data" : insertDataToDb})
                     .then(data => console.log("ok"))
                     .catch(e => console.log(e));
@@ -202,7 +202,7 @@ function insertToDb() {
 
         setTimeout(() => {
             insertToDb();
-        }, 500)
+        }, 100)
     }
 }
 
