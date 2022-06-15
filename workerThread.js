@@ -108,6 +108,8 @@ async function parseData(url) {
         }
     }
 
+    console.log(data.data)
+
     const hrefArray = [];
 
     try {
