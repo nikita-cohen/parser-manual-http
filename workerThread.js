@@ -1,6 +1,7 @@
 const axios = require("axios");
 const cheerio = require('cheerio');
 const {workerData, parentPort} = require("worker_threads");
+const https = require("https");
 
 let userAgent = [{'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Accept-Language' : '*'}
     , {'User-Agent' : "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36", 'Accept-Language' : '*'},
@@ -55,84 +56,248 @@ let userAgent = [{'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple
     {'User-Agent' : "Mozilla/5.0 (Windows; U; Windows NT 9.1; en-US; rv:12.9.1.11) Gecko/20100821 Firefox/70", 'Accept-Language' : '*'}
 ]
 
-let hostObj = [];
+let host = {
+    host : "95.182.120.214",
+    port : 44738,
+    headers : userAgent[Math.floor(Math.random() * 6)],
+    proxy : {
+        host : "95.182.120.214",
+        port : 44738,
+        headers : userAgent[Math.floor(Math.random() * 6)]
+    }
 
-axios.get("https://rootfails.com/proxy/f021011c43b83a07a58d3708aed53f5b").then(data => {
-    let host = data.data.split("\n");
+}
 
-    host.forEach(proxy => {
-
-        const obj = {};
-        obj.host = proxy.split(":")[0];
-        obj.port = proxy.split(":")[1];
-        obj.headers = userAgent[Math.floor(Math.random() * 6)]
-        obj.proxy = {};
-        obj.proxy.host = proxy.split(":")[0];
-        obj.proxy.port = proxy.split(":")[1];
-        obj.proxy.headers = userAgent[Math.floor(Math.random() * 6)]
-
-        hostObj.push(obj);
-    })
-
-})
+// let hostObj = [];
+//
+// axios.get("https://rootfails.com/proxy/f021011c43b83a07a58d3708aed53f5b").then(data => {
+//     let host = data.data.split("\n");
+//
+//     host.forEach(proxy => {
+//
+//         const obj = {};
+//         obj.host = proxy.split(":")[0];
+//         obj.port = proxy.split(":")[1];
+//         obj.headers = userAgent[Math.floor(Math.random() * 6)]
+//         obj.proxy = {};
+//         obj.proxy.host = proxy.split(":")[0];
+//         obj.proxy.port = proxy.split(":")[1];
+//         obj.proxy.headers = userAgent[Math.floor(Math.random() * 6)]
+//
+//         hostObj.push(obj);
+//     })
+//
+// })
 
 // , hostObj[Math.floor(Math.random() * hostObj.length)]
 
 async function parseData(url) {
+    let data;
 
-   const {data} = await axios.get(url ).catch(console.log)
-   const $ = cheerio.load(data);
-   const obj = {};
+    try {
+        data = await axios.get(url, host)
+    } catch (e) {
+        console.log("mistake --------------------------------------------------------")
+        try {
+            data = await axios.get(url, host)
+        } catch (e) {
+            console.log("can't take this url")
+        }
+    }
+    const hrefArray = [];
 
-   const header = $('h1.Uheader');
+    try {
+        const $ = cheerio.load(data.data);
 
-   obj.brand = $(header[0]).text();
+        const href = $("div.col-xs-3.col-sm-2.col1");
 
 
-   const category = $('div.cathead');
-   const categoryArray = [];
+        for (let i = 0; i < href.length; i++) {
+            hrefArray.push({url : "https://www.manualslib.com" + $(href[i]).children("a").attr('href'), type : "category"});
+        }
 
-   for (let i = 0; i < category.length; i++) {
-       categoryArray.push({"href":  $(category[i]).children("a").attr('href'), "text": $(category[i]).children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim()})
-   }
+    } catch (e) {
+        console.error(e)
+    }
 
-   for (let i = 0; i < categoryArray.length; i++) {
-       try {
-           obj.category = categoryArray[i].text;
+    console.log(hrefArray.length)
 
-           const dataTwo = await axios.get("https://www.manualslib.com" + categoryArray[i].href).catch()
-           const cher = cheerio.load(dataTwo.data);
+    parentPort.postMessage({message: "done", result: hrefArray, isForDb : false})
 
-           const aTag = cher('div.col-sm-2.mname')
-
-           for (let j = 0 ; j < aTag.length; j++) {
-               obj.url = "https://www.manualslib.com" + $(aTag[j]).children("a").attr('href');
-               obj.title = obj.brand + " " + categoryArray[i].text + " "  + $(aTag[j]).children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim();
-               //result.push(obj)
-               obj.id = obj.brand.replaceAll(' ', '_') + "_" + categoryArray[i].text.replaceAll(' ', '_') + "_"  + $(aTag[j]).children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim().replaceAll(' ', '_')
-
-               if (obj.url !== "https://www.manualslib.comundefined"){
-                   await axios.post("https://search.findmanual.guru/manual/search/insert", obj)
-                       .then(data => console.log("ok " + j))
-                       .catch(e => {
-                           console.log(e)
-                       });
-               }
-
-           }
-
-       } catch (e) {
-
-       }
-   }
-
-   parentPort.postMessage({message : "done"});
 }
 
-parseData(workerData.url).then();
+async function parseDataTwo(url) {
 
-parentPort.on('message' , async (m) => {
-    if (m.message === "run") {
-        await parseData(m.data.url)
+    console.log("here")
+    let data;
+
+    try {
+        data = await axios.get(url, host)
+    } catch (e) {
+        console.log("mistake --------------------------------------------------------")
+        try {
+            data = await axios.get(url, host).catch(console.log)
+        } catch (e) {
+            console.log("can't take this url")
+        }
     }
+    const hrefArray = [];
+
+    try {
+        const $ = cheerio.load(data.data);
+
+        const href = $("div.cathead");
+
+        for (let i = 0; i < href.length; i++) {
+            hrefArray.push({url : "https://www.manualslib.com" + $(href[i]).children("a").attr('href'), type : "lastUrl"});
+        }
+
+    } catch (e) {
+        console.error(e)
+    }
+
+    console.log(hrefArray.length)
+
+    parentPort.postMessage({message: "done", result: hrefArray , isForDb : false})
+
+}
+
+async function parseDataThree(url) {
+
+    let data;
+    let obj = {};
+    const result = [];
+
+    try {
+        data = await axios.get(url, host)
+    } catch (e) {
+        console.log("mistake --------------------------------------------------------")
+        try {
+            data = await axios.get(url, host)
+        } catch (e) {
+            console.log("can't take this url")
+        }
+    }
+
+    try {
+        const $ = cheerio.load(data.data);
+
+        const newUrl = new URL(url);
+        const array = newUrl.pathname.substring(1).split('/');
+
+        const brand = array[1].replaceAll("-", " ");
+        const category = array[2].replace('.html', "").replaceAll("-", " ");
+
+        const href = $("div.row.tabled");
+        let count = 1;
+        let isPages = true;
+
+        while (isPages) {
+            if (count === 1) {
+                for (let i = 0; i < href.length; i++) {
+                    let optionTwo = true;
+
+                    if ($(href[i]).children("div.col-sm-2.mname").children("a").attr('href') !== undefined) {
+                        obj.id = brand.replace(/[^a-zA-Z0-9 ]/g, '').trim().replaceAll(' ', '_') + "_" + category.replace(/[^a-zA-Z0-9 ]/g, '').trim().replaceAll(' ', '_') + "_" + $(href[i]).children("div.col-sm-2.mname").children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim().replaceAll(' ', '_');
+                        obj.brand = brand;
+                        obj.category = category;
+                        obj.url = "https://www.manualslib.com" + $(href[i]).children("div.col-sm-2.mname").children("a").attr('href');
+                        obj.title = brand + " " + obj.category + " " + $(href[i]).children("div.col-sm-2.mname").children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim();
+                        obj.parsingData =  new Date().toString()
+
+                        optionTwo = false;
+                        result.push(obj)
+                    }
+
+                    if (optionTwo) {
+                        if ($(href[i]).children("div.col-sm-2.mname").text() !== undefined) {
+                            obj.id = brand.replace(/[^a-zA-Z0-9 ]/g, '').trim().replaceAll(' ', '_') + "_" + category.replace(/[^a-zA-Z0-9 ]/g, '').trim().replaceAll(' ', '_') + "_" + $(href[i]).children("div.col-sm-2.mname").text().replace(/[^a-zA-Z0-9 ]/g, '').trim().replaceAll(' ', '_');
+                            obj.brand = brand;
+                            obj.category = category;
+                            obj.url = $(href[i]).children("div.col-sm-10.mlinks").children('div.fdiv').children('div.mdiv').children('div.fdiv').children('div.mdiv').children('a').attr('href').length > 0 ? "https://www.manualslib.com" + $(href[i]).children("div.col-sm-10.mlinks").children('div.fdiv').children('div.mdiv').children('div.fdiv').children('div.mdiv').children('a').attr('href') : "https://www.manualslib.com" + $(href[i]).children("div.col-sm-10.mlinks").children('div.fdiv').children('div.mdiv').children('div.fdiv').children('div.mdiv').children('a').attr('href')[0];
+                            obj.title = brand + " " + category + " " + $(href[i]).children("div.col-sm-2.mname").text().replace(/[^a-zA-Z0-9 ]/g, '').trim();
+                            obj.parsingData =  new Date().toString()
+                            result.push(obj)
+                        }
+                    }
+                }
+                count++;
+            } else {
+                let newPage;
+                let isContinue = true;
+
+                try {
+                    newPage = await axios.get(url + "?page=" + count, host);
+                } catch (e) {
+                    isContinue = false;
+                    isPages = false;
+                }
+
+                if (isContinue) {
+                    const cheerio1 = cheerio.load(newPage.data);
+                    const href = cheerio1("div.row.tabled");
+
+                    if (href.length > 0) {
+                        for (let i = 0; i < href.length; i++) {
+                            let optionTwo = true;
+
+                            if ($(href[i]).children("div.col-sm-2.mname").children("a").attr('href') !== undefined) {
+                                obj.id = brand.replace(/[^a-zA-Z0-9 ]/g, '').trim().replaceAll(' ', '_') + "_" + category.replace(/[^a-zA-Z0-9 ]/g, '').trim().replaceAll(' ', '_') + "_" + $(href[i]).children("div.col-sm-2.mname").children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim().replaceAll(' ', '_');
+                                obj.brand = brand;
+                                obj.category = category;
+                                obj.url = "https://www.manualslib.com" + $(href[i]).children("div.col-sm-2.mname").children("a").attr('href');
+                                obj.title = brand + " " + obj.category + " " + $(href[i]).children("div.col-sm-2.mname").children("a").text().replace(/[^a-zA-Z0-9 ]/g, '').trim();
+                                obj.parsingData =  new Date().toString()
+
+                                optionTwo = false;
+                                result.push(obj)
+                            }
+
+                            if (optionTwo) {
+                                if ($(href[i]).children("div.col-sm-2.mname").text() !== undefined) {
+                                    console.log("here 2")
+                                    obj.id = brand.replace(/[^a-zA-Z0-9 ]/g, '').trim().replaceAll(' ', '_') + "_" + category.replace(/[^a-zA-Z0-9 ]/g, '').trim().replaceAll(' ', '_') + "_" + $(href[i]).children("div.col-sm-2.mname").text().replace(/[^a-zA-Z0-9 ]/g, '').trim().replaceAll(' ', '_');
+                                    obj.brand = brand;
+                                    obj.category = category;
+                                    obj.url = $(href[i]).children("div.col-sm-10.mlinks").children('div.fdiv').children('div.mdiv').children('div.fdiv').children('div.mdiv').children('a').attr('href').length > 0 ? "https://www.manualslib.com" + $(href[i]).children("div.col-sm-10.mlinks").children('div.fdiv').children('div.mdiv').children('div.fdiv').children('div.mdiv').children('a').attr('href') : "https://www.manualslib.com" + $(href[i]).children("div.col-sm-10.mlinks").children('div.fdiv').children('div.mdiv').children('div.fdiv').children('div.mdiv').children('a').attr('href')[0];
+                                    obj.title = brand + " " + category + " " + $(href[i]).children("div.col-sm-2.mname").text().replace(/[^a-zA-Z0-9 ]/g, '').trim();
+                                    obj.parsingData =  new Date().toString()
+                                    result.push(obj)
+                                }
+                            }
+                        }
+                        count++;
+                    } else {
+                        isPages = false;
+                    }
+
+                }
+
+            }
+
+        }
+
+
+    } catch (e) {
+        console.error(e)
+    }
+
+
+    parentPort.postMessage({message: "done", result, isForDb : true})
+
+}
+
+parentPort.on('message', async (m) => {
+    if (m.message === "run") {
+        if (m.url.type === "brand") {
+            await parseData(m.url.url)
+        }
+        if (m.url.type === "category") {
+            await parseDataTwo(m.url.url)
+        }
+        if (m.url.type === "lastUrl") {
+            await parseDataThree(m.url.url)
+        }
+    }
+
 })

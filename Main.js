@@ -1,118 +1,232 @@
-const {Worker, workerData} = require("worker_threads");
+const {Worker} = require("worker_threads");
+const path = require("path");
+const axios = require("axios");
+const https = require("https");
 
-const data = [
-    {url: "https://www.manualslib.com/brand/acer/", maxNum: 158, num: 2},
-    {url: "https://www.manualslib.com/brand/aeg/", maxNum: 406, num: 3},
-    {url: "https://www.manualslib.com/brand/asus/", maxNum: 260, num: 4},
-    {url: "https://www.manualslib.com/brand/beko/", maxNum: 186, num: 5},
-    {url: "https://www.manualslib.com/brand/black-and-decker/", maxNum: 318, num: 6},
-    {url: "https://www.manualslib.com/brand/bosch/", maxNum: 644, num: 7},
-    {url: "https://www.manualslib.com/brand/brother/", maxNum: 128, num: 8},
-    {url: "https://www.manualslib.com/brand/canon/", maxNum: 196, num: 9},
-    {url: "https://www.manualslib.com/brand/casio/", maxNum: 180, num: 10},
-    {url: "https://www.manualslib.com/brand/cisco/", maxNum: 220, num: 11},
-    {url: "https://www.manualslib.com/brand/craftsman/", maxNum: 236, num: 12},
-    {url: "https://www.manualslib.com/brand/d-link/", maxNum: 218, num: 13},
-    {url: "https://www.manualslib.com/brand/dell/", maxNum: 210, num: 14},
-    {url: "https://www.manualslib.com/brand/electrolux/", maxNum: 238, num: 15},
-    {url: "https://www.manualslib.com/brand/emerson/", maxNum: 410, num: 16},
-    {url: "https://www.manualslib.com/brand/epson/", maxNum: 240, num: 17},
-    {url: "https://www.manualslib.com/brand/frigidaire/", maxNum: 112, num: 18},
-    {url: "https://www.manualslib.com/brand/fujitsu/", maxNum: 258, num: 19},
-    {url: "https://www.manualslib.com/brand/ge/", maxNum: 542, num: 20},
-    {url: "https://www.manualslib.com/brand/haier/", maxNum: 196, num: 21},
-    {url: "https://www.manualslib.com/brand/hitachi/", maxNum: 474, num: 22},
-    {url: "https://www.manualslib.com/brand/honda/", maxNum: 154, num: 23},
-    {url: "https://www.manualslib.com/brand/honeywell/", maxNum: 480, num: 24},
-    {url: "https://www.manualslib.com/brand/hp/", maxNum: 380, num: 25},
-    {url: "https://www.manualslib.com/brand/husqvarna/", maxNum: 188, num: 26},
-    {url: "https://www.manualslib.com/brand/jvc/", maxNum: 324, num: 27},
-    {url: "https://www.manualslib.com/brand/kenmore/", maxNum: 160, num: 28},
-    {url: "https://www.manualslib.com/brand/kenwood/", maxNum: 348, num: 29},
-    {url: "https://www.manualslib.com/brand/kitchenaid/", maxNum: 132, num: 30},
-    {url: "https://www.manualslib.com/brand/lenovo/", maxNum: 210, num: 31},
-    {url: "https://www.manualslib.com/brand/lg/", maxNum: 538, num: 32},
-    {url: "https://www.manualslib.com/brand/makita/", maxNum: 276, num: 33},
-    {url: "https://www.manualslib.com/brand/miele/", maxNum: 158, num: 34},
-    {url: "https://www.manualslib.com/brand/mitsubishi-electric/", maxNum: 266, num: 35},
-    {url: "https://www.manualslib.com/brand/motorola/", maxNum: 338, num: 36},
-    {url: "https://www.manualslib.com/brand/nec/", maxNum: 302, num: 37},
-    {url: "https://www.manualslib.com/brand/nokia/", maxNum: 174, num: 38},
-    {url: "https://www.manualslib.com/brand/panasonic/", maxNum: 860, num: 39},
-    {url: "https://www.manualslib.com/brand/philips/", maxNum: 856, num: 40},
-    {url: "https://www.manualslib.com/brand/pioneer/", maxNum: 322, num: 41},
-    {url: "https://www.manualslib.com/brand/rca/", maxNum: 302, num: 42},
-    {url: "https://www.manualslib.com/brand/samsung/", maxNum: 610, num: 43},
-    {url: "https://www.manualslib.com/brand/sanyo/", maxNum: 328, num: 44},
-    {url: "https://www.manualslib.com/brand/sharp/", maxNum: 422, num: 45},
-    {url: "https://www.manualslib.com/brand/siemens/", maxNum: 516, num: 46},
-    {url: "https://www.manualslib.com/brand/silvercrest/", maxNum: 390, num: 47},
-    {url: "https://www.manualslib.com/brand/sony/", maxNum: 572, num: 48},
-    {url: "https://www.manualslib.com/brand/toro/", maxNum: 204, num: 49},
-    {url: "https://www.manualslib.com/brand/toshiba/", maxNum: 424, num: 50},
-    {url: "https://www.manualslib.com/brand/whirlpool/", maxNum: 158, num: 51}
-]
+let queue = [
+    {url : "https://www.manualslib.com/brand/0.html" , type : "brand"},
+    {url : "https://www.manualslib.com/brand/1.html" , type : "brand"},
+    {url : "https://www.manualslib.com/brand/2.html" , type : "brand"},
+    {url : "https://www.manualslib.com/brand/3.html" , type : "brand"},
+    {url : "https://www.manualslib.com/brand/4.html" , type : "brand"},
+    {url : "https://www.manualslib.com/brand/5.html" , type : "brand"},
+    {url : "https://www.manualslib.com/brand/6.html" , type : "brand"},
+    {url : "https://www.manualslib.com/brand/7.html" , type : "brand"},
+    {url : "https://www.manualslib.com/brand/8.html" , type : "brand"},
+    {url : "https://www.manualslib.com/brand/9.html" , type : "brand"},
+    {url : "https://www.manualslib.com/brand/A.html" , type : "brand"},
+    {url : "https://www.manualslib.com/brand/A.html?page=2" , type : "brand"},
+    {url : "https://www.manualslib.com/brand/A.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/A.html?page=4", type : "brand"},
+    {url : "https://www.manualslib.com/brand/A.html?page=5", type : "brand"},
+    {url : "https://www.manualslib.com/brand/A.html?page=6", type : "brand"},
+    {url : "https://www.manualslib.com/brand/A.html?page=7", type : "brand"},
+    {url : "https://www.manualslib.com/brand/A.html?page=8", type : "brand"},
+    {url : "https://www.manualslib.com/brand/A.html?page=9", type : "brand"},
+    {url : "https://www.manualslib.com/brand/B.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/B.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/B.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/B.html?page=4", type : "brand"},
+    {url : "https://www.manualslib.com/brand/B.html?page=5", type : "brand"},
+    {url : "https://www.manualslib.com/brand/B.html?page=6", type : "brand"},
+    {url : "https://www.manualslib.com/brand/C.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/C.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/C.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/C.html?page=4", type : "brand"},
+    {url : "https://www.manualslib.com/brand/C.html?page=5", type : "brand"},
+    {url : "https://www.manualslib.com/brand/C.html?page=6", type : "brand"},
+    {url : "https://www.manualslib.com/brand/C.html?page=7", type : "brand"},
+    {url : "https://www.manualslib.com/brand/D.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/D.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/D.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/D.html?page=4", type : "brand"},
+    {url : "https://www.manualslib.com/brand/E.html?page=1", type : "brand"},
+    {url : "https://www.manualslib.com/brand/E.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/E.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/E.html?page=4", type : "brand"},
+    {url : "https://www.manualslib.com/brand/E.html?page=5", type : "brand"},
+    {url : "https://www.manualslib.com/brand/F.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/F.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/F.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/F.html?page=4", type : "brand"},
+    {url : "https://www.manualslib.com/brand/G.html?page=1", type : "brand"},
+    {url : "https://www.manualslib.com/brand/G.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/G.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/G.html?page=4", type : "brand"},
+    {url : "https://www.manualslib.com/brand/G.html?page=5", type : "brand"},
+    {url : "https://www.manualslib.com/brand/H.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/H.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/H.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/H.html?page=4", type : "brand"},
+    {url : "https://www.manualslib.com/brand/H.html?page=5", type : "brand"},
+    {url : "https://www.manualslib.com/brand/I.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/I.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/I.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/J.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/J.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/K.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/K.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/L.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/L.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/L.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/L.html?page=4", type : "brand"},
+    {url : "https://www.manualslib.com/brand/M.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/M.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/M.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/M.html?page=4", type : "brand"},
+    {url : "https://www.manualslib.com/brand/M.html?page=5", type : "brand"},
+    {url : "https://www.manualslib.com/brand/M.html?page=6", type : "brand"},
+    {url : "https://www.manualslib.com/brand/M.html?page=7", type : "brand"},
+    {url : "https://www.manualslib.com/brand/N.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/N.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/N.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/N.html?page=4", type : "brand"},
+    {url : "https://www.manualslib.com/brand/O.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/O.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/O.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/P.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/P.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/P.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/P.html?page=4", type : "brand"},
+    {url : "https://www.manualslib.com/brand/P.html?page=5", type : "brand"},
+    {url : "https://www.manualslib.com/brand/P.html?page=6", type : "brand"},
+    {url : "https://www.manualslib.com/brand/Q.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/R.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/R.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/R.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/R.html?page=4", type : "brand"},
+    {url : "https://www.manualslib.com/brand/R.html?page=5", type : "brand"},
+    {url : "https://www.manualslib.com/brand/S.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/S.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/S.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/S.html?page=4", type : "brand"},
+    {url : "https://www.manualslib.com/brand/S.html?page=5", type : "brand"},
+    {url : "https://www.manualslib.com/brand/S.html?page=6", type : "brand"},
+    {url : "https://www.manualslib.com/brand/S.html?page=7", type : "brand"},
+    {url : "https://www.manualslib.com/brand/S.html?page=8", type : "brand"},
+    {url : "https://www.manualslib.com/brand/S.html?page=9", type : "brand"},
+    {url : "https://www.manualslib.com/brand/S.html?page=10", type : "brand"},
+    {url : "https://www.manualslib.com/brand/S.html?page=11", type : "brand"},
+    {url : "https://www.manualslib.com/brand/T.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/T.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/T.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/T.html?page=4", type : "brand"},
+    {url : "https://www.manualslib.com/brand/T.html?page=5", type : "brand"},
+    {url : "https://www.manualslib.com/brand/T.html?page=6", type : "brand"},
+    {url : "https://www.manualslib.com/brand/U.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/U.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/V.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/V.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/V.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/W.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/W.html?page=2", type : "brand"},
+    {url : "https://www.manualslib.com/brand/W.html?page=3", type : "brand"},
+    {url : "https://www.manualslib.com/brand/X.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/Y.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/Z.html", type : "brand"},
+    {url : "https://www.manualslib.com/brand/Z.html?page=2", type : "brand"}
+];
+let dataForDb = [];
+let isRunning = true;
+const workers = [];
+const AMOUNT = 40;
 
-async function runWorker(url) {
-    return new Promise((resolve, reject) => {
-        const worker = new Worker('./workerThread', {
-            workerData: url
-        })
-        worker.on("message", (message) => {
-            if (message.message === "done") {
-                if (data.length > 0) {
-                    worker.postMessage({message : "run", data : data.shift()})
+const instance = axios.create(
+    {
+        baseURL : "https://search.findmanual.guru/manual/search/insert",
+        timeout : 60000,
+        httpsAgent : new https.Agent({keepAlive : true})
+    }
+)
+
+function createWorkers (patha) {
+    for (let i = 0; i < AMOUNT; i++) {
+        const w = new Worker(path.resolve(patha));
+        workers.push({worker: w});
+    }
+}
+
+function initWorker(url , idx) {
+        const {worker} = workers[idx];
+        worker.postMessage({message : "run" , url});
+
+        worker.on('message',(message) => {
+            if (message.message === "done" && message.isForDb === false) {
+                if (queue.length > 0) {
+                    queue = [...queue, ...message.result]
+                    worker.postMessage({message : "run" , url : queue.shift()});
+                }
+            }
+
+            if (message.message === "done" && message.isForDb === true) {
+                dataForDb = [...dataForDb, ...message.result]
+                if (queue.length > 0) {
+                    worker.postMessage({message : "run" , url : queue.shift()});
                 } else {
-                    resolve(message)
+                    console.log(message);
                 }
             }
         });
-        worker.on("error", reject);
-        worker.on("exit", (code) => {
-            if (code !== 0) reject(new Error("something go wrong"));
-        })
-    })
 
+
+        worker.on('error', error => {
+            console.log(error);
+        })
+
+        worker.on("exit", (code) => {
+            if (code !== 0) console.log(new Error("something go wrong"));
+        })
 }
 
 function loadArray() {
-    return new Promise((resolve, reject) => {
-        Promise.all(data.map((d, i) => {
-            if (i < 50) {
-                console.log("index " + i)
-                return runWorker(data.shift())
-            }
-        })).then(resolve).catch(reject);
-    });
+    for(let i = 0; i < 40; i++) {
+        console.log(i)
+        initWorker(queue.shift(), i);
+    }
 }
 
-async function initLoadingArray() {
+function initLoadingArray() {
     console.time('parsing_array');
-    await loadArray();
+    loadArray();
     console.timeEnd('parsing_array');
 }
 
-function resetAtMidnight() {
-    let now = new Date();
-    let night = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate() + 1, // the next day, ...
-        0, 0, 0 // ...at 00:00:00 hours
-    );
+function insertToDb() {
+    if(isRunning) {
+        if (dataForDb.length >= 200) {
+            const insertDataToDb = dataForDb.splice(0, 100);
+            instance.post("https://search.findmanual.guru/manual/search/insert", {"data" : insertDataToDb})
+                    .then(data => console.log("ok"))
+                    .catch(e => console.log(e));
+        }
 
-    let msToMidnight = night.getTime() - now.getTime();
-    setTimeout(async function() {
-        await initLoadingArray();            //  <-- This is the function being called at midnight.
-        resetAtMidnight();    //      Then, reset again next midnight.
-    }, msToMidnight);
+        setTimeout(() => {
+            insertToDb();
+        }, 500)
+    }
 }
+
+// function resetAtMidnight() {
+//     let now = new Date();
+//     let night = new Date(
+//         now.getFullYear(),
+//         now.getMonth(),
+//         now.getDate() + 1, // the next day, ...
+//         0, 0, 0 // ...at 00:00:00 hours
+//     );
+//
+//     let msToMidnight = night.getTime() - now.getTime();
+//     setTimeout(async function() {
+//         await initLoadingArray();            //  <-- This is the function being called at midnight.
+//         resetAtMidnight();    //      Then, reset again next midnight.
+//     }, msToMidnight);
+// }
 
 function init() {
-    resetAtMidnight();
+    createWorkers('./workerThread.js')
+    insertToDb();
+    initLoadingArray();
 }
 
-init()
-
-
+init();
 
